@@ -84,6 +84,8 @@ sum(ves.rep.units$dist_m)
 
 plot(ves.rep.units["grade"], type = "b")
 
+# https://en.wikipedia.org/wiki/Naismith%27s_rule
+
 # https://www.outsideonline.com/outdoor-adventure/hiking-and-backpacking/ultimate-backpacking-calorie-estimator/
 # How the Backpacking Calculator Works
 # I spent some time playing around with the equation to see what it tells us, using the example of a 150-pound person carrying a 50-pound pack at 4 miles per hour on a gravel path as the reference case. The equation itself isn’t particularly revealing, but for the record here it is:
