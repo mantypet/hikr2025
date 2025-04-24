@@ -57,7 +57,27 @@ ves_elevation <- sf::st_as_sf(coordinates_ok, coords = c("X", "Y", "Z"), crs = 4
   mutate(id = ves$id) |>
   select(id, geometry)
 
+# re-project to EUREF-FIN / TM35FIN(E,N) -- Finland
 ves.rep <- ves_elevation |>
-  sf::st_transform(3067)
+  sf::st_transform(3067) |>
+  cbind(coordinates_ok)
 
 plot(ves.rep)
+plot(ves.rep$Z, type = "l")
+
+break_proportional <- 0.1
+min_km_moving <- 12
+min_km_total <- 12/(1-break_proportional)
+
+ves.rep.units <- ves.rep |>
+  mutate(dist_m = as.numeric(st_distance(lag(geometry), geometry, by_element = TRUE))) |>
+  mutate(dist_m = replace_na(dist_m, 0)) |>
+  mutate(cum_dist_m = cumsum(dist_m)) |>
+  mutate(t_min_avg_total = (cum_dist_m/1000)*min_km_total,
+         t_h_avg_total = t_min_avg_total/60)
+
+sum(ves.rep.units$dist_m)
+
+plot(ves.rep.units)
+
+
