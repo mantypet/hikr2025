@@ -84,4 +84,15 @@ sum(ves.rep.units$dist_m)
 
 plot(ves.rep.units["grade"], type = "b")
 
+# https://www.outsideonline.com/outdoor-adventure/hiking-and-backpacking/ultimate-backpacking-calorie-estimator/
+# How the Backpacking Calculator Works
+# I spent some time playing around with the equation to see what it tells us, using the example of a 150-pound person carrying a 50-pound pack at 4 miles per hour on a gravel path as the reference case. The equation itself isn’t particularly revealing, but for the record here it is:
+# M = 1.5 W + 2.0 (W + L)(L/W)2 + n(W + L)(1.5V2 + 0.35VG)
+# Here M is the metabolic rate, which is how quickly you’re burning energy. This equation gives you a value in watts, but that’s easy to convert to other units like calories per hour.
 
+# The inputs into the equation are:
+# W: your weight (kg)
+# L: the weight of your pack (kg)
+# V: your hiking speed (m/s)
+# G: the grade of any incline (%)
+# n: a “terrain factor” that adjusts the results for different surfaces (for example, a paved road has a terrain factor of 1.0, but a gravel road is 1.2, since it takes more calories to walk on a soft or uneven surface)
