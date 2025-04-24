@@ -74,10 +74,14 @@ ves.rep.units <- ves.rep |>
   mutate(dist_m = replace_na(dist_m, 0)) |>
   mutate(cum_dist_m = cumsum(dist_m)) |>
   mutate(t_min_avg_total = (cum_dist_m/1000)*min_km_total,
-         t_h_avg_total = t_min_avg_total/60)
+         t_h_avg_total = t_min_avg_total/60) |>
+  mutate(Z_diff = replace_na((lag(Z)-Z),0),
+         Z_gain = ifelse(Z_diff < 0, 0, Z_diff),
+         Z_gain_cum = cumsum(Z_gain),
+         grade = (Z_gain / dist_m)*100)
 
 sum(ves.rep.units$dist_m)
 
-plot(ves.rep.units)
+plot(ves.rep.units["grade"], type = "b")
 
 
