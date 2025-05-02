@@ -1,3 +1,4 @@
+library(plyr)
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -8,6 +9,10 @@ library(httr)
 library(jsonlite)
 library(ggplot2)
 library(slider)
+library(changepoint)
+# https://cran.r-project.org/web/packages/bcpa/vignettes/UnivariateBCPA.html
+# require(devtools); install_github("EliGurarie/bcpa")
+library(bcpa)
 
 # Local data only! TODO: add accessible example data
 
@@ -20,7 +25,36 @@ pyrkka.rep <- pyrkka_gpx |>
   mutate(t_s = as.numeric(time-min(time, na.rm = T)),
          t = as.numeric(lead(time)-time),
          dist_m = as.numeric(st_distance(lag(geometry), geometry, by_element = TRUE)),
-         dist_m.ma = slide_dbl(dist_m, ~mean(.x), .before = 6, .after = 6))
+         dist_m.ma = slide_dbl(dist_m, ~mean(.x), .before = 6, .after = 6)) |>
+  mutate(dist_m = replace_na(dist_m, 0))
+
+
+# https://www.r-bloggers.com/2021/03/detect-the-changes-in-timeseries-data/
+# Detect the Changes with the changepoint
+# change in mean
+# ansmean=cpt.mean(my_series, method = 'BinSeg')
+# plot(ansmean,cpt.col='blue')
+# print(ansmean)
+
+# https://cran.r-project.org/web/packages/bcpa/vignettes/UnivariateBCPA.html
+
+pyrkka.400 <- pyrkka.rep |> filter(t_s >= 700 & t_s <= 1900)
+
+# change in mean https://www.jstatsoft.org/article/download/v058i03/750
+ansmean <- cpt.mean(pyrkka.400$dist_m, method = 'BinSeg', Q = 10)
+plot(ansmean,cpt.col='blue')
+print(ansmean)
+
+cpts <- ansmean@cpts
+means <- ansmean@param.est[["mean"]]
+
+pyrkka.ws <- pyrkka.400 |>
+  sf::st_drop_geometry() |>
+  WindowSweep(variable = "dist_m", time.var = "t_s", windowsize = 50, windowstep = 1, progress=TRUE)
+
+head(pyrkka.ws$ws)
+
+plot(pyrkka.ws, type = "smooth", threshold = 12)
 
 pyrkka.phase_manual <- pyrkka.rep |>
   mutate(phase = case_when(t_s >= 760 & t_s <= 858 ~ "m400|A|effort",
